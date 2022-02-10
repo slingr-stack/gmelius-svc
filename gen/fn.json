@@ -1,0 +1,259 @@
+{
+  "fileName": "gmelius-helpers",
+  "endpointName": "gmelius",
+  "omittableUrlParts": ["auth"],
+  "apiDescriptors": [
+    {
+      "prefix": "",
+      "suffix": "",
+      "method": "POST",
+      "url": "/token/introspection"
+    },
+    {
+      "prefix": "",
+      "suffix": "",
+      "method": "POST",
+      "url": "/token/revocation"
+    },
+    {
+      "prefix": "",
+      "suffix": "",
+      "method": "GET",
+      "url": "/me"
+    },
+    {
+      "prefix": "",
+      "suffix": "get",
+      "method": "GET",
+      "url": "/auth/boards"
+    },
+    {
+      "prefix": "",
+      "suffix": "post",
+      "method": "POST",
+      "url": "/auth/boards"
+    },
+    {
+      "prefix": "",
+      "suffix": "get",
+      "method": "GET",
+      "url": "/auth/boards/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "put",
+      "method": "PUT",
+      "url": "/auth/boards/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "delete",
+      "method": "DELETE",
+      "url": "/auth/boards/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "get",
+      "method": "GET",
+      "url": "/auth/boards/:id/columns"
+    },
+    {
+      "prefix": "",
+      "suffix": "post",
+      "method": "POST",
+      "url": "/auth/boards/:id/columns"
+    },
+    {
+      "prefix": "",
+      "suffix": "get",
+      "method": "GET",
+      "url": "/auth/boards/columns/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "patch",
+      "method": "PATCH",
+      "url": "/auth/boards/columns/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "delete",
+      "method": "DELETE",
+      "url": "/auth/boards/columns/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "get",
+      "method": "GET",
+      "url": "/auth/boards/:id/cards"
+    },
+    {
+      "prefix": "",
+      "suffix": "get",
+      "method": "GET",
+      "url": "/auth/boards/cards/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "patch",
+      "method": "PATCH",
+      "url": "/auth/boards/cards/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "delete",
+      "method": "DELETE",
+      "url": "/auth/boards/cards/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "post",
+      "method": "POST",
+      "url": "/auth/boards/cards"
+    },
+    {
+      "prefix": "",
+      "suffix": "post",
+      "method": "POST",
+      "url": "/auth/boards/cards/:id/tags"
+    },
+    {
+      "prefix": "",
+      "suffix": "delete",
+      "method": "DELETE",
+      "url": "/auth/boards/cards/:id/tags/:tagId"
+    },
+    {
+      "prefix": "",
+      "suffix": "getAll",
+      "method": "GET",
+      "url": "/auth/sharedfolders"
+    },
+    {
+      "prefix": "",
+      "suffix": "get",
+      "method": "GET",
+      "url": "/auth/sharedfolders/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "get",
+      "method": "GET",
+      "url": "/auth/sharedfolders/:id/conversations"
+    },
+    {
+      "prefix": "",
+      "suffix": "get",
+      "method": "GET",
+      "url": "/auth/conversations/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "post",
+      "method": "POST",
+      "url": "/auth/conversations/:id/notes"
+    },
+    {
+      "prefix": "",
+      "suffix": "post",
+      "method": "POST",
+      "url": "/auth/conversations/:id/reply"
+    },
+    {
+      "prefix": "",
+      "suffix": "post",
+      "method": "POST",
+      "url": "/auth/conversations/:id/tags"
+    },
+    {
+      "prefix": "",
+      "suffix": "put",
+      "method": "PUT",
+      "url": "/auth/conversations/:id/assignee"
+    },
+    {
+      "prefix": "",
+      "suffix": "put",
+      "method": "PUT",
+      "url": "/auth/conversations/:id/status"
+    },
+    {
+      "prefix": "",
+      "suffix": "getAll",
+      "method": "GET",
+      "url": "/auth/sequences"
+    },
+    {
+      "prefix": "",
+      "suffix": "getAll",
+      "method": "GET",
+      "url": "/auth/sequences/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "post",
+      "method": "POST",
+      "url": "/auth/sequences/enroll/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "delete",
+      "method": "DELETE",
+      "url": "/auth/sequences/disenroll/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "post",
+      "method": "POST",
+      "url": "/auth/notes"
+    },
+    {
+      "prefix": "",
+      "suffix": "put",
+      "method": "PUT",
+      "url": "/auth/notes/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "delete",
+      "method": "DELETE",
+      "url": "/auth/notes/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "patch",
+      "method": "PATCH",
+      "url": "/auth/tags/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "getAll",
+      "method": "GET",
+      "url": "/auth/webhooks"
+    },
+    {
+      "prefix": "",
+      "suffix": "post",
+      "method": "POST",
+      "url": "/auth/webhooks"
+    },
+    {
+      "prefix": "",
+      "suffix": "get",
+      "method": "GET",
+      "url": "/auth/events"
+    },
+    {
+      "prefix": "",
+      "suffix": "get",
+      "method": "GET",
+      "url": "/auth/webhooks/:id"
+    },
+    {
+      "prefix": "",
+      "suffix": "delete",
+      "method": "DELETE",
+      "url": "/auth/webhooks/:id"
+    }
+  ]
+}

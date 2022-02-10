@@ -1,6 +1,6 @@
 {
-  "label": "QuickBooks",
-  "name": "quickbooks",
+  "label": "Gmelius",
+  "name": "gmelius",
   "apiVersion": "v1",
   "internal": false,
   "configurationType": "GLOBAL",
@@ -15,8 +15,6 @@
     ],
     "allowMultipleInstances": false
   },
-  "icon48": "https://storage.googleapis.com/static.slingrs.io/platform/endpoints/quickbooks.png",
-  "configurationHelpUrl": "/endpoints_quickbooks.html#configuration",
   "status": "ACTIVE",
   "stores": [
     {"name": "tokens"}
@@ -25,7 +23,7 @@
     {
       "label": "Webhook",
       "name": "webhook",
-      "description": "Notifications from QuickBooks about entities"
+      "description": "Notifications from Gmelius about entities"
     }
   ],
   "functions": [
@@ -38,17 +36,21 @@
       "name": "_post"
     },
     {
-      "label": "Convert date to time",
-      "name": "_convertDateToTimestamp"
+      "label": "PUT",
+      "name": "_put"
     },
     {
-      "label": "Format from milliseconds",
-      "name": "_formatFromMillis"
+      "label": "PATCH",
+      "name": "_patch"
+    },
+    {
+      "label": "DELETE",
+      "name": "_delete"
     }
   ],
   "scripts": [
-    "quickbooks-fn-helpers.js",
-    "functions.js"
+    "gmelius-helpers.js",
+    "http-generic-helpers.js"
   ],
   "configuration": [
     {
@@ -56,69 +58,53 @@
       "label": "Client ID",
       "type": "text",
       "required": true
-    },{
+    },
+    {
       "name": "clientSecret",
       "label": "Client Secret",
       "type": "text",
       "required": true
-    },{
-      "name": "companyId",
-      "label": "Company ID",
+    },
+    {
+      "name": "codeVerifier",
+      "label": "Code Challenge Hashed",
+      "type": "text"
+    },
+    {
+      "name": "codeChallenge",
+      "label": "Code Challenge",
+      "type": "text"
+    },
+    {
+      "name": "authorizationCode",
+      "label": "Authorization Code",
       "type": "text",
       "required": true
     },
     {
-      "name": "accessToken",
-      "label": "Access Token",
-      "type": "text",
-      "required": true
+      "name": "redirectUriLabel",
+      "label": "Registered URI",
+      "description": "Redirect URI to register on your application",
+      "type": "label",
+      "value": "config.BASE_SERVER_URL+ '/callback'"
     },
     {
-      "name": "refreshToken",
-      "label": "Refresh Token",
+      "name": "redirectUri",
+      "label": "Registered URI",
+      "description": "Redirect URI to register on your application",
       "type": "text",
-      "required": true
+      "value": "config.BASE_SERVER_URL+ '/callback'",
+      "visibility" : "false"
     },
     {
-      "name": "quickBooksEnvironment",
-      "label": "QuickBooks environment",
-      "type": "buttonsGroup",
-      "required": true,
-      "defaultValue": "SANDBOX",
+      "name" : "connectButton",
+      "label" : "Connect to Gmelius",
+      "type" : "button",
       "typeOptions": {
-          "allowCustom": true,
-          "possibleValues":[
-              {
-                  "label":"Sandbox",
-                  "name":"SANDBOX"
-              },
-              {
-                  "label":"Production",
-                  "name":"PRODUCTION"
-              }
-          ]
+        "color" : "primary",
+        "icon" : "zmdi-play",
+        "action" : "var scopes = 'offline_access;https://api.gmelius.com/public/auth/boards/read;https://api.gmelius.com/public/auth/conversations/metadata;https://api.gmelius.com/public/auth/conversations/insert;https://api.gmelius.com/public/auth/boards/read;https://api.gmelius.com/public/auth/boards/modify';\nvar redirectUri = config.redirectUri;\nvar codeChallenge = 'D7sFU_KQ_StNgw3-smiBD-hhpzlN2LZVBA82p0Zeb5c';\nvar codeVerifier = 'thisNeedsToBeFixed';\n\nvar url = 'https://gmelius.io/oauth/authorize?client_id=' + config.clientId + '&code_challenge=' + codeChallenge + '&scope=' + scopes + '&redirect_uri=' + redirectUri;\nvar win = window.open(url, 'Authorization page', 'toolbar=no,scrollbars=no,location=no,statusbar=no,menubar=no,resizable=0,width=500,height=600,left=' + ((screen.width / 2) - 250) + ',top=' + ((screen.height / 2) - 250) + ',');\n\nvar self = this;\n\nvar intervalFn = function () {\n\ttry {\n\t\tif (!win || !win.document) {\n\t\t\twindow.clearInterval(pollTimer);\n\t\t} else {\n\t\t\tif (win.document.URL.indexOf('/callback') != -1) {\n\t\t\t\twin.innerWidth = 100;\n\t\t\t\twin.innerHeight = 100;\n\t\t\t\twin.screenX = screen.width;\n\t\t\t\twin.screenY = screen.height;\n\t\t\t\twindow.clearInterval(pollTimer);\n\t\t\t\turl_string = win.document.URL;\n\t\t\t\tvar url = new URL(url_string);\n\t\t\t\tvar token = url.searchParams.get(\"code\");\n\t\t\t\tif (token) {\n\t\t\t\t\tconfig.authorizationCode = token;\n\t\t\t\t\tconfig.codeVerifier = codeVerifier;\n\t\t\t\t\tconfig.codeChallenge = codeChallenge;\n\t\t\t\t}\n\t\t\t}\n\t\t\ttry { win.close(); } catch (e) { }\n\t\t}\n\t} catch (e) { }\n};\n\nvar pollTimer = window.setInterval(function () { intervalFn.apply(self) }, 500);"
       }
-    },
-    {
-      "name": "verifierToken",
-      "label": "Webhooks Verifier Token",
-      "type": "text",
-      "required": false
-    },
-    {
-      "name": "minorVersion",
-      "label": "Minor Version",
-      "type": "text",
-      "required": true,
-      "typeOptions": {
-        "validation": "number"
-      }
-    },
-    {
-      "name": "configuration",
-      "label": "Configuration",
-      "value": "To obtain the requested fields for configuration you need to log in to your intuit developer account and go to <a href='https://developer.intuit.com/v2/ui#/playground' target='_blank'>Test connect to app (OAuth)</a>. On this page you need to: <ul><li>Complete the form selecting the app you want to configure on the endpoint.</li><li>Once you select the app the Client ID and Client Secret fields are being populated. You can copy this values to the endpoint configuration.</li><li>Select the Scopes (Accounting is the only available for now).</li><li>Click on Get authorization code and authorize the app.</li><li>Then click on Get Tokens button.</li><li>Once you have the Tokens you can start making calls to the API. On this screen you need to access to the step 4 and copy the Access Token and the Refresh Token to the endpoint configuration.</li></ul>",
-      "type": "info"
     },
     {
         "name": "webhook",
