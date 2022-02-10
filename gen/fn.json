@@ -23,7 +23,7 @@
     },
     {
       "prefix": "",
-      "suffix": "get",
+      "suffix": "getAll",
       "method": "GET",
       "url": "/auth/boards"
     },

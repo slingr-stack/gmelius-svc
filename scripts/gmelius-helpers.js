@@ -55,7 +55,7 @@ endpoint.me = function(httpOptions) {
 
 endpoint.boards = {};
 
-endpoint.boards.get = function(httpOptions) {
+endpoint.boards.getAll = function(httpOptions) {
 	var url = parse('/auth/boards');
 	sys.logs.debug('[gmelius] GET from: ' + url);
 	return endpoint.get(url, httpOptions);

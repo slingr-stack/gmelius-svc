@@ -108,7 +108,7 @@ app.endpoints.gmelius.me()
 * API URL: '/auth/boards'
 * HTTP Method: 'GET'
 ```javascript
-app.endpoints.gmelius.boards.get()
+app.endpoints.gmelius.boards.getAll()
 ```
 ---
 * API URL: '/auth/boards/:id'
