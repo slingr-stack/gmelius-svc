@@ -88,7 +88,7 @@
       "label": "Registered URI",
       "description": "Redirect URI to register on your application",
       "type": "label",
-      "value": "config.BASE_SERVER_URL+ '/callback'"
+      "value": "config.SERVER_URL+ '/callback'"
     },
     {
       "name": "webhook",
