@@ -1,30 +1,17 @@
 package io.slingr.endpoints.gmelius;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import io.slingr.endpoints.HttpEndpoint;
 import io.slingr.endpoints.exceptions.EndpointException;
 import io.slingr.endpoints.framework.annotations.*;
 import io.slingr.endpoints.services.AppLogs;
 import io.slingr.endpoints.services.HttpService;
 import io.slingr.endpoints.services.datastores.DataStore;
-import io.slingr.endpoints.services.rest.RestMethod;
 import io.slingr.endpoints.utils.Json;
 import io.slingr.endpoints.ws.exchange.FunctionRequest;
 import io.slingr.endpoints.ws.exchange.WebServiceRequest;
-import io.slingr.endpoints.ws.exchange.WebServiceResponse;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Base64;
-import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -59,7 +46,7 @@ public class GmeliusEndpoint extends HttpEndpoint {
     private String authorizationCode;
 
     @EndpointProperty
-    private String redirect_uri;
+    private String redirectUri;
 
     @EndpointProperty
     private String accessToken;
@@ -78,13 +65,21 @@ public class GmeliusEndpoint extends HttpEndpoint {
 
     @Override
     public void endpointStarted() {
-//        this.tokenManager = new TokenManager(httpService(), tokensDataStore, clientId, clientSecret, authorizationCode,  codeVerifier, redirect_uri);
-//        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(tokenManager::refreshQuickBooksToken, TOKEN_REFRESH_POLLING_TIME, TOKEN_REFRESH_POLLING_TIME, TimeUnit.MILLISECONDS);
+        try {
+            this.tokenManager = new TokenManager(httpService(), tokensDataStore, clientId, clientSecret, authorizationCode, codeVerifier, redirectUri);
+            Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(tokenManager::refreshAccessToken, TOKEN_REFRESH_POLLING_TIME, TOKEN_REFRESH_POLLING_TIME, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            appLogger.error(String.format("Error refreshing token for client ID [%s]. You might need to get a new refresh token.", clientId));
+            throw e;
+        }
     }
 
-    @EndpointWebService(path = "/callback")
-    public WebServiceResponse webhooks(WebServiceRequest request) {
-        return HttpService.defaultWebhookResponse();
+    @EndpointWebService(path = "/")
+    public String webhooks(WebServiceRequest request) {
+        System.out.println("HOLA WEBHOOK");
+        final Json json = HttpService.defaultWebhookConverter(request);
+        events().send(HttpService.WEBHOOK_EVENT, json);
+        return "ok";
     }
 
     @EndpointFunction(name = "_get")
@@ -95,7 +90,7 @@ public class GmeliusEndpoint extends HttpEndpoint {
         } catch (EndpointException restException) {
             if (checkInvalidTokenError(restException)) {
                 //needs to refresh token
-                tokenManager.refreshQuickBooksToken();
+                tokenManager.refreshAccessToken();
                 return defaultGetRequest(request);
             }
             throw restException;
@@ -110,7 +105,7 @@ public class GmeliusEndpoint extends HttpEndpoint {
         } catch (EndpointException restException) {
             if (checkInvalidTokenError(restException)) {
                 //needs to refresh token
-                tokenManager.refreshQuickBooksToken();
+                tokenManager.refreshAccessToken();
                 return defaultPostRequest(request);
             }
             throw restException;
@@ -123,7 +118,7 @@ public class GmeliusEndpoint extends HttpEndpoint {
             return defaultPutRequest(request);
         } catch (EndpointException restException) {
             if (checkInvalidTokenError(restException)) {
-                tokenManager.refreshQuickBooksToken();
+                tokenManager.refreshAccessToken();
                 return defaultPutRequest(request);
             }
             throw restException;
@@ -136,7 +131,7 @@ public class GmeliusEndpoint extends HttpEndpoint {
             return defaultPatchRequest(request);
         } catch (EndpointException restException) {
             if (checkInvalidTokenError(restException)) {
-                tokenManager.refreshQuickBooksToken();
+                tokenManager.refreshAccessToken();
                 return defaultPatchRequest(request);
             }
             throw restException;
@@ -149,7 +144,7 @@ public class GmeliusEndpoint extends HttpEndpoint {
             return defaultDeleteRequest(request);
         } catch (EndpointException restException) {
             if (checkInvalidTokenError(restException)) {
-                tokenManager.refreshQuickBooksToken();
+                tokenManager.refreshAccessToken();
                 return defaultDeleteRequest(request);
             }
             throw restException;
@@ -157,9 +152,14 @@ public class GmeliusEndpoint extends HttpEndpoint {
     }
 
     private boolean checkInvalidTokenError(Exception e) {
+        System.out.println("CHECK INVALID TOKEN ERROR");
         if (e instanceof EndpointException) {
             EndpointException restException = (EndpointException) e;
-            return restException.getCode() != null && restException.getCode().getCode().equals("401");
+            if (restException.getCode() != null) {
+                System.out.println("ERROR CODE");
+                System.out.println(restException.getReturnCode());
+            }
+            return restException.getReturnCode() == 401;
         }
         return false;
     }
