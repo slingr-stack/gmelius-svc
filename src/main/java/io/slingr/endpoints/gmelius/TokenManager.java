@@ -64,12 +64,8 @@ public class TokenManager {
 
         Json lastToken = this.getLastToken();
         DataStoreResponse dsResp = ds.find(filter);
-        System.out.println("dsResp " + dsResp.getItems().toString());
-        System.out.println("dsResp " + dsResp.getItems().size());
-
 
         if (dsResp != null && dsResp.getItems().size() == 0 || lastToken == null) { // new token was added
-            System.out.println("ACCESSTOKEN NOT FOUND ");
                 Form formBody = new Form().param("grant_type", "authorization_code")
                         .param("code", this.authorizationCode)
                         .param("scope", "offline_access")
@@ -79,9 +75,6 @@ public class TokenManager {
                         .header("Content-Type", "application/x-www-form-urlencoded")
                         .basicAuthenticationHeader(clientId, clientSecret)
                         .post(formBody);
-
-                System.out.println("ACCESSTOKEN " + refreshTokenResponse.string("access_token"));
-                System.out.println("REFRESH " + refreshTokenResponse.string("refresh_token"));
 
             this.refreshToken = refreshTokenResponse.string("refresh_token");
             this.accessToken = refreshTokenResponse.string("access_token");
@@ -94,10 +87,6 @@ public class TokenManager {
             newToken.set(ID, LAST_TOKEN);
             this.ds.save(newToken);
         } else {
-            System.out.println("ACCESS TOKEN FOUND ");
-            System.out.println("ACCESSTOKEN " + lastToken.string(ACCESS_TOKEN));
-            System.out.println("REFRESH " + lastToken.string(REFRESH_TOKEN));
-
             this.accessToken = lastToken.string(ACCESS_TOKEN);
             this.refreshToken = lastToken.string(REFRESH_TOKEN);
         }
@@ -109,9 +98,6 @@ public class TokenManager {
 
     public void refreshAccessToken() {
 
-        System.out.println("REFRESH TOKEN " + this.refreshToken);
-        System.out.println("GMELIUS_API_TOKEN_URL" + GMELIUS_API_TOKEN_URL);
-
         Form formBody = new Form().param("grant_type", "refresh_token").param("refresh_token", this.refreshToken);
         Json refreshTokenResponse = RestClient.builder(GMELIUS_API_TOKEN_URL)
                 .header("Content-Type", "application/x-www-form-urlencoded")
@@ -120,10 +106,6 @@ public class TokenManager {
                 .post(formBody);
 
         Json lastToken = this.getLastToken();
-
-        System.out.println("ACCESSTOKEN " + refreshTokenResponse.string("access_token"));
-        System.out.println("REFRESH " + refreshTokenResponse.string("refresh_token"));
-
         if (refreshTokenResponse.string("refresh_token") != null) {
             this.refreshToken = refreshTokenResponse.string("refresh_token");
             lastToken.set(REFRESH_TOKEN, this.refreshToken);

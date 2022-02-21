@@ -76,7 +76,6 @@ public class GmeliusEndpoint extends HttpEndpoint {
 
     @EndpointWebService(path = "/")
     public String webhooks(WebServiceRequest request) {
-        System.out.println("HOLA WEBHOOK");
         final Json json = HttpService.defaultWebhookConverter(request);
         events().send(HttpService.WEBHOOK_EVENT, json);
         return "ok";
@@ -152,31 +151,13 @@ public class GmeliusEndpoint extends HttpEndpoint {
     }
 
     private boolean checkInvalidTokenError(Exception e) {
-        System.out.println("CHECK INVALID TOKEN ERROR");
         if (e instanceof EndpointException) {
             EndpointException restException = (EndpointException) e;
             if (restException.getCode() != null) {
-                System.out.println("ERROR CODE");
                 System.out.println(restException.getReturnCode());
             }
             return restException.getReturnCode() == 401;
         }
         return false;
     }
-
-//    @EndpointFunction(name = "_PKCEgenerator")
-//    public Json PKCEGenerator() {
-//        String codeVerifier = null;
-//        try {
-//            codeVerifier = PKCEManager.generateCodeVerifier();
-//            String codeChallenge = PKCEManager.generateCodeChallange(codeVerifier);
-//        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//            logger.error("Error generating PKCE strings");
-//        }
-//        Json res = Json.map();
-//        res.set("codeVerifier", codeVerifier);
-//        res.set("codeChallenge", codeChallenge);
-//        return res;
-//    }
 }
