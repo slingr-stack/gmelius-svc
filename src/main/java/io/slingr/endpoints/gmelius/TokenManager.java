@@ -66,6 +66,7 @@ public class TokenManager {
                     .post(formBody);
             this.refreshToken = refreshTokenResponse.string("refresh_token");
             this.accessToken = refreshTokenResponse.string("access_token");
+            appLogger.info("Tokens succefully retrieved on endpoint start");
             System.out.println("retrieved refreshToken " + refreshTokenResponse.string("refresh_token"));
             System.out.println("retrieved accessToken " + refreshTokenResponse.string("access_token"));
 
