@@ -69,7 +69,7 @@ public class GmeliusEndpoint extends HttpEndpoint {
             this.tokenManager = new TokenManager(httpService(), tokensDataStore, clientId, clientSecret, authorizationCode, codeVerifier, redirectUri);
             Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(tokenManager::refreshAccessToken, TOKEN_REFRESH_POLLING_TIME, TOKEN_REFRESH_POLLING_TIME, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            appLogger.error(String.format("Error refreshing token for client ID [%s]. You might need to get a new refresh token.", clientId));
+            appLogger.error(String.format("Error getting token for client ID [%s]. Endpoint should be redeployed.", clientId));
             throw e;
         }
     }
