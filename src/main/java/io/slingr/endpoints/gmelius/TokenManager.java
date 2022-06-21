@@ -1,18 +1,13 @@
 package io.slingr.endpoints.gmelius;
 
 import io.slingr.endpoints.exceptions.EndpointException;
+import io.slingr.endpoints.framework.annotations.ApplicationLogger;
+import io.slingr.endpoints.services.AppLogs;
 import io.slingr.endpoints.services.HttpService;
 import io.slingr.endpoints.services.datastores.DataStore;
-import io.slingr.endpoints.services.datastores.DataStoreResponse;
 import io.slingr.endpoints.services.rest.RestClient;
 import io.slingr.endpoints.utils.Json;
-import org.apache.commons.lang.StringUtils;
-
-import javax.json.stream.JsonGenerator;
 import javax.ws.rs.core.Form;
-import java.util.Base64;
-
-import static io.slingr.endpoints.utils.Base64Utils.encode;
 
 public class TokenManager {
 
@@ -36,7 +31,11 @@ public class TokenManager {
     private String refreshToken;
     private HttpService httpService;
 
-    TokenManager(HttpService httpService, DataStore ds, String clientId, String clientSecret, String authorizationCode, String codeVerifier, String redirectUri) {
+    @ApplicationLogger
+    private AppLogs appLogger;
+
+    TokenManager(HttpService httpService, DataStore ds, String clientId, String clientSecret, String authorizationCode,
+            String codeVerifier, String redirectUri) {
 
         this.httpService = httpService;
         this.ds = ds;
@@ -45,39 +44,30 @@ public class TokenManager {
         this.authorizationCode = authorizationCode;
         this.codeVerifier = codeVerifier;
         this.redirectUri = redirectUri;
-        System.out.println("clientId " + this.clientId);
-        System.out.println("clientSecret " + this.clientSecret);
-        System.out.println("code " + this.authorizationCode);
-        System.out.println("code_verifier " + this.codeVerifier);
-        System.out.println("redirect_uri " + this.redirectUri);
-        System.out.println("authorizationCode " + this.authorizationCode);
-
-        System.out.println(encode(String.format("%s:%s", clientId, clientSecret)));
-
         this.setLastToken();
         this.setupToken();
     }
 
     public void setLastToken() {
-        Json filter = Json.map();
-        filter.set(AUTHORIZATION_CODE, this.authorizationCode);
-
         Json lastToken = this.getLastToken();
-        DataStoreResponse dsResp = ds.find(filter);
-
-        if (dsResp != null && dsResp.getItems().size() == 0 || lastToken == null) { // new token was added
-                Form formBody = new Form().param("grant_type", "authorization_code")
-                        .param("code", this.authorizationCode)
-                        .param("scope", "offline_access")
-                        .param("code_verifier", this.codeVerifier)
-                        .param("redirect_uri", this.redirectUri);
-                Json refreshTokenResponse = RestClient.builder(GMELIUS_API_TOKEN_URL)
-                        .header("Content-Type", "application/x-www-form-urlencoded")
-                        .basicAuthenticationHeader(clientId, clientSecret)
-                        .post(formBody);
-
+        if (lastToken == null || lastToken.string(ACCESS_TOKEN) == null) { // new token was added
+            System.out.println("getting token for first time" + this.codeVerifier);
+            System.out.println("code: " + this.authorizationCode);
+            System.out.println("code_verfier " + this.codeVerifier);
+            System.out.println("Redirect uri: " + this.redirectUri);
+            Form formBody = new Form().param("grant_type", "authorization_code")
+                    .param("code", this.authorizationCode)
+                    .param("scope", "offline_access")
+                    .param("code_verifier", this.codeVerifier)
+                    .param("redirect_uri", this.redirectUri);
+            Json refreshTokenResponse = RestClient.builder(GMELIUS_API_TOKEN_URL)
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .basicAuthenticationHeader(clientId, clientSecret)
+                    .post(formBody);
             this.refreshToken = refreshTokenResponse.string("refresh_token");
             this.accessToken = refreshTokenResponse.string("access_token");
+            System.out.println("retrieved refreshToken " + refreshTokenResponse.string("refresh_token"));
+            System.out.println("retrieved accessToken " + refreshTokenResponse.string("access_token"));
 
             Json newToken = Json.map();
             newToken.set(ACCESS_TOKEN, this.accessToken);
@@ -97,26 +87,29 @@ public class TokenManager {
     }
 
     public void refreshAccessToken() {
-
-        Form formBody = new Form().param("grant_type", "refresh_token").param("refresh_token", this.refreshToken);
-        Json refreshTokenResponse = RestClient.builder(GMELIUS_API_TOKEN_URL)
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .header("Accept", "application/json")
-                .basicAuthenticationHeader(this.clientId, this.clientSecret)
-                .post(formBody);
-
-        Json lastToken = this.getLastToken();
-        if (refreshTokenResponse.string("refresh_token") != null) {
-            this.refreshToken = refreshTokenResponse.string("refresh_token");
-            lastToken.set(REFRESH_TOKEN, this.refreshToken);
+        try {
+            System.out.println("Refreshing Tokens ");
+            Form formBody = new Form().param("grant_type", "refresh_token").param("refresh_token", this.refreshToken);
+            Json refreshTokenResponse = RestClient.builder(GMELIUS_API_TOKEN_URL)
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .header("Accept", "application/json")
+                    .basicAuthenticationHeader(this.clientId, this.clientSecret)
+                    .post(formBody);
+            Json lastToken = this.getLastToken();
+            if (refreshTokenResponse.string("refresh_token") != null) {
+                System.out.println("New refresh token arrived" + refreshTokenResponse.string("refresh_token"));
+                this.refreshToken = refreshTokenResponse.string("refresh_token");
+                lastToken.set(REFRESH_TOKEN, this.refreshToken);
+            }
+            this.accessToken = refreshTokenResponse.string("access_token");
+            lastToken.set(ACCESS_TOKEN, this.accessToken);
+            lastToken.set(TIMESTAMP, System.currentTimeMillis());
+            ds.save(lastToken);
+            this.setupToken();
+        } catch (EndpointException error) {
+            appLogger.error(String.format(
+                    "Error refreshing tokens for client ID [%s]. You might need to get a new refresh token.", clientId));
         }
-        this.accessToken = refreshTokenResponse.string("access_token");
-
-        lastToken.set(ACCESS_TOKEN, this.accessToken);
-        lastToken.set(TIMESTAMP, System.currentTimeMillis());
-        ds.save(lastToken);
-
-        this.setupToken();
     }
 
     public void setupToken() {
