@@ -67,13 +67,15 @@ public class GmeliusEndpoint extends HttpEndpoint {
     @Override
     public void endpointStarted() {
         EndpointProperties properties =  properties();
-        String redirectUri = properties.getWebServicesUri() + "/callback";
+        String redirectUri = properties.getBaseDomain() + "/callback";
+        String redirectUri2 = properties.getOriginalWebServicesUri() + "/callback";
         appLogger.info("Redirect uri: " + redirectUri);
+        appLogger.info("Redirect uri2: " + redirectUri2);
         try {
             this.tokenManager = new TokenManager(httpService(), tokensDataStore, clientId, clientSecret, authorizationCode, codeVerifier, redirectUri);
             Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(tokenManager::refreshAccessToken, TOKEN_REFRESH_POLLING_TIME, TOKEN_REFRESH_POLLING_TIME, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            appLogger.error(String.format("Error getting token for client ID [%s]. Endpoint should be redeployed.", clientId));
+            appLogger.error(String.format("Error getting token for client ID [%s]. Endpoint should be redeployed.", clientId),e);
             appLogger.error(e.getMessage());
             throw e;
         }
