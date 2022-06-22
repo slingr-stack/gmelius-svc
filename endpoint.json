@@ -95,7 +95,7 @@
       "label": "Registered URI",
       "description": "Redirect URI to register on your application",
       "type": "text",
-      "value": "config.SERVER_URL+ '/callback'",
+      "defaultValue": "config.SERVER_URL+ '/callback'",
       "visibility": false
     },
     {
