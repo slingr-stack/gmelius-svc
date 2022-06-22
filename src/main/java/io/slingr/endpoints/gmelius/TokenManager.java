@@ -1,8 +1,6 @@
 package io.slingr.endpoints.gmelius;
 
 import io.slingr.endpoints.exceptions.EndpointException;
-import io.slingr.endpoints.framework.annotations.ApplicationLogger;
-import io.slingr.endpoints.services.AppLogs;
 import io.slingr.endpoints.services.HttpService;
 import io.slingr.endpoints.services.datastores.DataStore;
 import io.slingr.endpoints.services.datastores.DataStoreResponse;
@@ -32,9 +30,6 @@ public class TokenManager {
     private String refreshToken;
     private HttpService httpService;
 
-    @ApplicationLogger
-    private AppLogs appLogger;
-
     TokenManager(HttpService httpService, DataStore ds, String clientId, String clientSecret, String authorizationCode,
             String codeVerifier, String redirectUri) {
 
@@ -57,10 +52,10 @@ public class TokenManager {
         DataStoreResponse dsResp = ds.find(filter);
 
         if (dsResp != null && dsResp.getItems().size() == 0 || lastToken == null || lastToken.string(ACCESS_TOKEN) == null) { 
-            appLogger.info("Getting token for first time" + this.codeVerifier);
-            appLogger.info("Code: " + this.authorizationCode);
-            appLogger.info("Code_verfier " + this.codeVerifier);
-            appLogger.info("Redirect uri: " + this.redirectUri);
+            System.out.println("Getting token for first time" + this.codeVerifier);
+            System.out.println("Code: " + this.authorizationCode);
+            System.out.println("Code_verfier " + this.codeVerifier);
+            System.out.println("Redirect uri: " + this.redirectUri);
             Form formBody = new Form().param("grant_type", "authorization_code")
                     .param("code", this.authorizationCode)
                     .param("scope", "offline_access")
@@ -72,7 +67,7 @@ public class TokenManager {
                     .post(formBody);
             this.refreshToken = refreshTokenResponse.string("refresh_token");
             this.accessToken = refreshTokenResponse.string("access_token");
-            appLogger.info("Tokens succefully retrieved on endpoint start");
+            System.out.println("Tokens succefully retrieved on endpoint start");
             System.out.println("retrieved refreshToken " + refreshTokenResponse.string("refresh_token"));
             System.out.println("retrieved accessToken " + refreshTokenResponse.string("access_token"));
 
@@ -114,8 +109,9 @@ public class TokenManager {
             ds.save(lastToken);
             this.setupToken();
         } catch (EndpointException error) {
-            appLogger.error(String.format(
+            System.out.println(String.format(
                     "Error refreshing tokens for client ID [%s]. You might need to get a new refresh token.", clientId));
+            throw error;
         }
     }
 
