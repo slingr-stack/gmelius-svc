@@ -57,10 +57,10 @@ public class TokenManager {
         DataStoreResponse dsResp = ds.find(filter);
 
         if (dsResp != null && dsResp.getItems().size() == 0 || lastToken == null || lastToken.string(ACCESS_TOKEN) == null) { 
-            System.out.println("getting token for first time" + this.codeVerifier);
-            System.out.println("code: " + this.authorizationCode);
-            System.out.println("code_verfier " + this.codeVerifier);
-            System.out.println("Redirect uri: " + this.redirectUri);
+            appLogger.info("Getting token for first time" + this.codeVerifier);
+            appLogger.info("Code: " + this.authorizationCode);
+            appLogger.info("Code_verfier " + this.codeVerifier);
+            appLogger.info("Redirect uri: " + this.redirectUri);
             Form formBody = new Form().param("grant_type", "authorization_code")
                     .param("code", this.authorizationCode)
                     .param("scope", "offline_access")
