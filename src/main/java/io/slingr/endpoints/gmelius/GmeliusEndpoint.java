@@ -1,6 +1,8 @@
 package io.slingr.endpoints.gmelius;
 
 import io.slingr.endpoints.HttpEndpoint;
+import io.slingr.endpoints.configurations.EndpointProperties;
+import io.slingr.endpoints.configurations.Properties;
 import io.slingr.endpoints.exceptions.EndpointException;
 import io.slingr.endpoints.framework.annotations.*;
 import io.slingr.endpoints.services.AppLogs;
@@ -16,6 +18,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.security.auth.login.Configuration;
+
 /**
  * Gmelius endpoint
  * <p/>
@@ -25,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class GmeliusEndpoint extends HttpEndpoint {
     private static final Logger logger = LoggerFactory.getLogger(GmeliusEndpoint.class);
     private static final String GMELIUS_API = "https://api.gmelius.com/public/v2";
-    private static final long TOKEN_REFRESH_POLLING_TIME = TimeUnit.MINUTES.toMillis(50);
+    private static final long TOKEN_REFRESH_POLLING_TIME = TimeUnit.MINUTES.toMillis(50);    
 
     @EndpointDataStore(name = TokenManager.DATA_STORE)
     private DataStore tokensDataStore;
@@ -46,9 +50,6 @@ public class GmeliusEndpoint extends HttpEndpoint {
     private String authorizationCode;
 
     @EndpointProperty
-    private String redirectUri;
-
-    @EndpointProperty
     private String accessToken;
 
     @ApplicationLogger
@@ -65,6 +66,9 @@ public class GmeliusEndpoint extends HttpEndpoint {
 
     @Override
     public void endpointStarted() {
+        EndpointProperties properties =  properties();
+        String redirectUri = properties.getWebServicesUri() + "/callback";
+        appLogger.info("Redirect uri: " + redirectUri);
         try {
             this.tokenManager = new TokenManager(httpService(), tokensDataStore, clientId, clientSecret, authorizationCode, codeVerifier, redirectUri);
             Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(tokenManager::refreshAccessToken, TOKEN_REFRESH_POLLING_TIME, TOKEN_REFRESH_POLLING_TIME, TimeUnit.MILLISECONDS);

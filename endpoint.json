@@ -84,18 +84,11 @@
       "required": true
     },
     {
-      "name": "redirectUriLabel",
+      "name": "redirectUri",
       "label": "Registered URI",
       "description": "Redirect URI to register on your application",
       "type": "label",
       "value": "config.SERVER_URL+ '/callback'"
-    },
-    {
-      "name": "redirectUri",
-      "label": "Registered URI",
-      "description": "Redirect URI registered on your application",
-      "type": "text",
-      "visibility": true
     },
     {
       "name": "webhook",
