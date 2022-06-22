@@ -93,10 +93,10 @@
     {
       "name": "redirectUri",
       "label": "Registered URI",
-      "description": "Redirect URI to register on your application",
+      "description": "Url to build connection url",
       "type": "text",
       "defaultValue": "@config.SERVER_URL + '/callback'",
-      "visibility": false
+      "visibility": true
     },
     {
       "name": "webhook",
