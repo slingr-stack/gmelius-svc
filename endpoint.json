@@ -88,14 +88,14 @@
       "label": "Registered URI",
       "description": "Redirect URI to register on your application",
       "type": "label",
-      "value": "config.SERVER_URL+ '/callback'"
+      "value": "@config.SERVER_URL+ '/callback'"
     },
     {
       "name": "redirectUri",
       "label": "Registered URI",
       "description": "Redirect URI to register on your application",
       "type": "text",
-      "defaultValue": "config.SERVER_URL+ '/callback'",
+      "defaultValue": "@config.SERVER_URL+ '/callback'",
       "visibility": false
     },
     {
@@ -112,7 +112,7 @@
       "typeOptions": {
         "color" : "primary",
         "icon" : "zmdi-play",
-        "action" : "var scopes = 'offline_access;https://api.gmelius.com/public/auth/conversations/read;https://api.gmelius.com/public/auth/conversations/metadata;https://api.gmelius.com/public/auth/conversations/insert;https://api.gmelius.com/public/auth/boards/read;https://api.gmelius.com/public/auth/boards/modify';\nvar redirectUri = config.redirectUriLabel;\nvar codeChallenge = 'XkZXWx_vlPZEOD_iCTBejVMsERlEhTS7JfrH5P1y6AM';\nvar codeVerifier = 'ykzczDS4Z4Ezlfzu8kiXqqTvBQHOmJ2YW1uzBNT1nJiC7BcDvol0Pnh7eCzejRAzhmb1JL15CYddf58irMDJkFj4WnIaTRBxWbHgDOdZwH4Pa9lS9ERTYjadDgrR';\nvar url = 'https://gmelius.io/oauth/authorize?client_id=' + config.clientId + '&code_challenge=' + codeChallenge + '&scope=' + scopes + '&redirect_uri=' + redirectUri;\nvar win = window.open(url, 'Authorization page', 'toolbar=no,scrollbars=no,location=no,statusbar=no,menubar=no,resizable=0,width=500,height=600,left=' + ((screen.width / 2) - 250) + ',top=' + ((screen.height / 2) - 250) + ',');\nvar self = this;\nvar intervalFn = function () {\n\ttry {\n\t\tif (!win || !win.location) {\n\t\t\twindow.clearInterval(pollTimer);\n\t\t} else {\n\t\t\tif (win.location.href.indexOf('/callback') != -1) {\n\t\t\t\twin.innerWidth = 100;\n\t\t\t\twin.innerHeight = 100;\n\t\t\t\twin.screenX = screen.width;\n\t\t\t\twin.screenY = screen.height;\n\t\t\t\twindow.clearInterval(pollTimer);\n\t\t\t\turl = win.location.href;\n\t\t\t\tvar pos = url.indexOf('code=');\n\t\t\t\tvar token\n\t\t\t\tif(pos > -1) {\n\t\t\t\t\ttoken = url.substring(pos + 5);\n\t\t\t\t\tconfig.authorizationCode = token;\n\t\t\t\t\tconfig.codeVerifier = codeVerifier;\n\t\t\t\t\tconfig.codeChallenge = codeChallenge;\n\t\t\t\t}\n\t\t\t}\n\t\t\ttry { win.close(); } catch (e) { }\n\t\t}\n\t} catch (e) {}\n};\nvar pollTimer = window.setInterval(function () { intervalFn.apply(self) }, 500);"
+        "action" : "var scopes = 'offline_access;https://api.gmelius.com/public/auth/conversations/read;https://api.gmelius.com/public/auth/conversations/metadata;https://api.gmelius.com/public/auth/conversations/insert;https://api.gmelius.com/public/auth/boards/read;https://api.gmelius.com/public/auth/boards/modify';\nvar redirectUri = config.SERVER_URL+'/callback';\nvar codeChallenge = 'XkZXWx_vlPZEOD_iCTBejVMsERlEhTS7JfrH5P1y6AM';\nvar codeVerifier = 'ykzczDS4Z4Ezlfzu8kiXqqTvBQHOmJ2YW1uzBNT1nJiC7BcDvol0Pnh7eCzejRAzhmb1JL15CYddf58irMDJkFj4WnIaTRBxWbHgDOdZwH4Pa9lS9ERTYjadDgrR';\nvar url = 'https://gmelius.io/oauth/authorize?client_id=' + config.clientId + '&code_challenge=' + codeChallenge + '&scope=' + scopes + '&redirect_uri=' + redirectUri;\nvar win = window.open(url, 'Authorization page', 'toolbar=no,scrollbars=no,location=no,statusbar=no,menubar=no,resizable=0,width=500,height=600,left=' + ((screen.width / 2) - 250) + ',top=' + ((screen.height / 2) - 250) + ',');\nvar self = this;\nvar intervalFn = function () {\n\ttry {\n\t\tif (!win || !win.location) {\n\t\t\twindow.clearInterval(pollTimer);\n\t\t} else {\n\t\t\tif (win.location.href.indexOf('/callback') != -1) {\n\t\t\t\twin.innerWidth = 100;\n\t\t\t\twin.innerHeight = 100;\n\t\t\t\twin.screenX = screen.width;\n\t\t\t\twin.screenY = screen.height;\n\t\t\t\twindow.clearInterval(pollTimer);\n\t\t\t\turl = win.location.href;\n\t\t\t\tvar pos = url.indexOf('code=');\n\t\t\t\tvar token\n\t\t\t\tif(pos > -1) {\n\t\t\t\t\ttoken = url.substring(pos + 5);\n\t\t\t\t\tconfig.authorizationCode = token;\n\t\t\t\t\tconfig.codeVerifier = codeVerifier;\n\t\t\t\t\tconfig.codeChallenge = codeChallenge;\n\t\t\t\t}\n\t\t\t}\n\t\t\ttry { win.close(); } catch (e) { }\n\t\t}\n\t} catch (e) {}\n};\nvar pollTimer = window.setInterval(function () { intervalFn.apply(self) }, 500);"
       }
     }
   ]
