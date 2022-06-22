@@ -88,14 +88,14 @@
       "label": "Registered URI",
       "description": "Redirect URI to register on your application",
       "type": "label",
-      "value": "@config.SERVER_URL+ '/callback'"
+      "value": "config.SERVER_URL+ '/callback'"
     },
     {
       "name": "redirectUri",
       "label": "Registered URI",
       "description": "Url to build connection url",
       "type": "text",
-      "defaultValue": "@config.SERVER_URL + '/callback'",
+      "defaultValue": "config.redirectUriLabel",
       "visibility": true
     },
     {
