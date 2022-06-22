@@ -70,6 +70,7 @@ public class GmeliusEndpoint extends HttpEndpoint {
             Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(tokenManager::refreshAccessToken, TOKEN_REFRESH_POLLING_TIME, TOKEN_REFRESH_POLLING_TIME, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             appLogger.error(String.format("Error getting token for client ID [%s]. Endpoint should be redeployed.", clientId));
+            appLogger.error(e.getMessage());
             throw e;
         }
     }

@@ -5,6 +5,7 @@ import io.slingr.endpoints.framework.annotations.ApplicationLogger;
 import io.slingr.endpoints.services.AppLogs;
 import io.slingr.endpoints.services.HttpService;
 import io.slingr.endpoints.services.datastores.DataStore;
+import io.slingr.endpoints.services.datastores.DataStoreResponse;
 import io.slingr.endpoints.services.rest.RestClient;
 import io.slingr.endpoints.utils.Json;
 import javax.ws.rs.core.Form;
@@ -49,8 +50,13 @@ public class TokenManager {
     }
 
     public void setLastToken() {
+        Json filter = Json.map();
+        filter.set(AUTHORIZATION_CODE, this.authorizationCode);
+
         Json lastToken = this.getLastToken();
-        if (lastToken == null || lastToken.string(ACCESS_TOKEN) == null) { // new token was added
+        DataStoreResponse dsResp = ds.find(filter);
+
+        if (dsResp != null && dsResp.getItems().size() == 0 || lastToken == null || lastToken.string(ACCESS_TOKEN) == null) { 
             System.out.println("getting token for first time" + this.codeVerifier);
             System.out.println("code: " + this.authorizationCode);
             System.out.println("code_verfier " + this.codeVerifier);
